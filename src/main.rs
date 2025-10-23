@@ -1,4 +1,5 @@
 use std::{env, process};
+use std::path::Path;
 
 fn main() {
     println!("Welcome to repopack!");
@@ -10,11 +11,11 @@ fn main() {
         process::exit(1);
     });
 
-    println!("Packing repository located in: {}", config.file_path);
+    println!("Packing repository located in: {}", config.repo_path);
 }
 
 struct Config {
-    file_path: String
+    repo_path: String
 }
 
 impl Config {
@@ -23,8 +24,12 @@ impl Config {
             return Err("Not enough arguments");
         }
 
-        let file_path = args[1].clone();
+        let repo_path = args[1].clone();
 
-        Ok(Config { file_path })
+        if !Path::new(&repo_path).is_dir() {
+            return Err("The specified path does not exist or is not a directory");
+        }
+
+        Ok(Config { repo_path })
     }
 }
