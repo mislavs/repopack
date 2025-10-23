@@ -1,6 +1,6 @@
 use std::{env, error::Error, process};
 use std::path::Path;
-use walkdir::{DirEntry, WalkDir};
+use ignore::WalkBuilder;
 
 fn main() {
     println!("Welcome to repopack!");
@@ -52,19 +52,12 @@ fn run(config: Config) -> Result<(), Box<dyn Error>> {
 }
 
 fn get_file_paths(repo_path: &str) -> Vec<String> {
-    WalkDir::new(repo_path)
-        .into_iter()
-        .filter_entry(|e| is_not_hidden(e))
+    WalkBuilder::new(repo_path)
+        .build()
         .filter_map(|e| e.ok())
-        .filter(|e| e.file_type().is_file())
+        .filter(|e| {
+            e.file_type().map(|ft| ft.is_file()).unwrap_or(false)
+        })
         .map(|e| e.path().display().to_string())
         .collect()
-}
-
-fn is_not_hidden(entry: &DirEntry) -> bool {
-    entry
-        .file_name()
-        .to_str()
-        .map(|s| entry.depth() == 0 || !s.starts_with("."))
-        .unwrap_or(false)
 }
