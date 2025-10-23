@@ -1,5 +1,6 @@
-use std::{env, process};
+use std::{env, error::Error, process};
 use std::path::Path;
+use walkdir::{DirEntry, WalkDir};
 
 fn main() {
     println!("Welcome to repopack!");
@@ -11,7 +12,10 @@ fn main() {
         process::exit(1);
     });
 
-    println!("Packing repository located in: {}", config.repo_path);
+    if let Err(e) = run(config) {
+        println!("Application error: {e}");
+        process::exit(1);
+    }
 }
 
 struct Config {
@@ -32,4 +36,35 @@ impl Config {
 
         Ok(Config { repo_path })
     }
+}
+
+fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    println!("Packing repository located in: {}", config.repo_path);
+
+    let files = get_file_paths(&config.repo_path);
+
+    println!("Found {} files:", files.len());
+    for file in files {
+        println!("{}", file);
+    }
+
+    Ok(())
+}
+
+fn get_file_paths(repo_path: &str) -> Vec<String> {
+    WalkDir::new(repo_path)
+        .into_iter()
+        .filter_entry(|e| is_not_hidden(e))
+        .filter_map(|e| e.ok())
+        .filter(|e| e.file_type().is_file())
+        .map(|e| e.path().display().to_string())
+        .collect()
+}
+
+fn is_not_hidden(entry: &DirEntry) -> bool {
+    entry
+        .file_name()
+        .to_str()
+        .map(|s| entry.depth() == 0 || !s.starts_with("."))
+        .unwrap_or(false)
 }
