@@ -50,10 +50,10 @@ fn run(config: Config) -> Result<(), Box<dyn Error>> {
     for file in &files {
         match file.token_count {
             Some(count) => {
-                println!("{:<80} {:>12}", file.path, count);
+                println!("{:<80} {:>12}", file.path.display(), count);
             }
             None => {
-                println!("{:<80} {:>12}", file.path, "unknown");
+                println!("{:<80} {:>12}", file.path.display(), "unknown");
             }
         }
     }
