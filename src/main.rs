@@ -1,6 +1,6 @@
 use std::{env, error::Error, process};
 use std::path::Path;
-use repopack::get_file_paths;
+use repopack::get_file_metadata;
 
 fn main() {
     println!("Welcome to repopack!");
@@ -41,12 +41,27 @@ impl Config {
 fn run(config: Config) -> Result<(), Box<dyn Error>> {
     println!("Packing repository located in: {}", config.repo_path);
 
-    let files = get_file_paths(&config.repo_path);
+    let files = get_file_metadata(&config.repo_path);
 
-    println!("Found {} files:", files.len());
-    for file in files {
-        println!("{}", file);
+    // Print table header
+    println!("\n{:<80} {:>12}", "File Path", "Tokens");
+    println!("{}", "-".repeat(94));
+
+    for file in &files {
+        match file.token_count {
+            Some(count) => {
+                println!("{:<80} {:>12}", file.path, count);
+            }
+            None => {
+                println!("{:<80} {:>12}", file.path, "unknown");
+            }
+        }
     }
+
+    // Print summary
+    println!("{}", "-".repeat(94));
+    let total_tokens: usize = files.iter().filter_map(|f| f.token_count).sum();
+    println!("Total files: {} | Total tokens: {}", files.len(), total_tokens);
 
     Ok(())
 }

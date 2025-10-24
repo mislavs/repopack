@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 ignore = "0.4"
+tiktoken-rs = "0.7.0"
