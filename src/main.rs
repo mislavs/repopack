@@ -48,14 +48,8 @@ fn run(config: Config) -> Result<(), Box<dyn Error>> {
     println!("{}", "-".repeat(94));
 
     for file in &files {
-        match file.token_count {
-            Some(count) => {
-                println!("{:<80} {:>12}", file.path.display(), count);
-            }
-            None => {
-                println!("{:<80} {:>12}", file.path.display(), "unknown");
-            }
-        }
+        let count = file.token_count.map_or("unknown".to_string(), |count| count.to_string());
+        println!("{:<80} {:>12}", file.path.display(), count);
     }
 
     // Print summary
