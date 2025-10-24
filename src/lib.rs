@@ -3,14 +3,13 @@ use tiktoken_rs::cl100k_base;
 
 use ignore::WalkBuilder;
 
-pub fn get_file_metadata(repo_path: &str) -> Vec<FileMetadata> {
+pub fn get_file_metadata(repo_path: &str) -> impl Iterator<Item = FileMetadata> {
     get_file_paths(repo_path)
         .into_iter()
         .map(|path| FileMetadata {
             path: path.clone(),
             token_count: calculate_token_size_for_file(&path).ok(),
         })
-        .collect()
 }
 
 fn calculate_token_size_for_file(file_path: &Path) -> Result<usize, Box<dyn Error>> {

@@ -41,21 +41,26 @@ impl Config {
 fn run(config: Config) -> Result<(), Box<dyn Error>> {
     println!("Packing repository located in: {}", config.repo_path);
 
-    let files = get_file_metadata(&config.repo_path);
-
     // Print table header
     println!("\n{:<80} {:>12}", "File Path", "Tokens");
     println!("{}", "-".repeat(94));
 
-    for file in &files {
+    let mut file_count = 0;
+    let mut total_tokens = 0;
+
+    for file in get_file_metadata(&config.repo_path) {
         let count = file.token_count.map_or("unknown".to_string(), |count| count.to_string());
         println!("{:<80} {:>12}", file.path.display(), count);
+        
+        file_count += 1;
+        if let Some(tokens) = file.token_count {
+            total_tokens += tokens;
+        }
     }
 
     // Print summary
     println!("{}", "-".repeat(94));
-    let total_tokens: usize = files.iter().filter_map(|f| f.token_count).sum();
-    println!("Total files: {} | Total tokens: {}", files.len(), total_tokens);
+    println!("Total files: {} | Total tokens: {}", file_count, total_tokens);
 
     Ok(())
 }
