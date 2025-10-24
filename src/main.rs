@@ -28,13 +28,13 @@ impl Config {
             return Err("Not enough arguments");
         }
 
-        let repo_path = args[1].clone();
+        let repo_path = &args[1];
 
-        if !Path::new(&repo_path).is_dir() {
+        if !Path::new(repo_path).is_dir() {
             return Err("The specified path does not exist or is not a directory");
         }
 
-        Ok(Config { repo_path })
+        Ok(Config { repo_path: repo_path.clone() })
     }
 }
 
