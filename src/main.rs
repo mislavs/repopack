@@ -42,25 +42,27 @@ fn run(config: Config) -> Result<(), Box<dyn Error>> {
     println!("Packing repository located in: {}", config.repo_path);
 
     // Print table header
-    println!("\n{:<80} {:>12}", "File Path", "Tokens");
-    println!("{}", "-".repeat(94));
+    println!("\n{:<80} {:>12} {:>12}", "File Path", "Tokens", "Lines");
+    println!("{}", "-".repeat(106));
 
     let mut file_count = 0;
     let mut total_tokens = 0;
+    let mut total_lines = 0;
 
     for file in get_file_metadata(&config.repo_path) {
         let count = file.token_count.map_or("unknown".to_string(), |count| count.to_string());
-        println!("{:<80} {:>12}", file.path.display(), count);
+        println!("{:<80} {:>12} {:>12}", file.path.display(), count, file.line_count);
         
         file_count += 1;
+        total_lines += file.line_count;
         if let Some(tokens) = file.token_count {
             total_tokens += tokens;
         }
     }
 
     // Print summary
-    println!("{}", "-".repeat(94));
-    println!("Total files: {} | Total tokens: {}", file_count, total_tokens);
+    println!("{}", "-".repeat(106));
+    println!("Total files: {} | Total tokens: {} | Total lines: {}", file_count, total_tokens, total_lines);
 
     Ok(())
 }
